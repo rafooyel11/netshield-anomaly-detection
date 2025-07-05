@@ -1,0 +1,13 @@
+# Virtual Environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+#Saved Models
+*.h5
+*.joblib
+
+# VS Code settings
+.vscode/
