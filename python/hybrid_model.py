@@ -18,7 +18,7 @@ def load_all_models():
     rf_path = os.path.join(project_dir, 'models', 'random_forest_model.joblib') 
     autoencoder_path = os.path.join(project_dir, 'models', 'autoencoder_model.h5')
     threshold_path = os.path.join(project_dir, 'models', 'anomaly_threshold.txt')
-    mapping_path = os.path.join(project_dir, 'models', 'attack_mapping.json')
+    mapping_path = os.path.join(project_dir, 'json', 'attack_mapping.json')
 
     # load the files using their paths
     rf_model = joblib.load(rf_path)
