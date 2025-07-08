@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,116 +7,75 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-color: #111827;
-      /* A slightly lighter gray-900 for better contrast */
+      background-color: #111827; /* A slightly lighter gray-900 for better contrast */
     }
-
     .sidebar {
       width: 250px;
       height: 100vh;
       position: fixed;
       top: 0;
       left: 0;
-      background-color: #1f2937;
-      /* gray-800 */
+      background-color: #1f2937; /* gray-800 */
       transition: transform 0.3s ease-in-out;
       z-index: 50;
     }
-
     .sidebar.collapsed {
       transform: translateX(-100%);
     }
-
     .content {
       margin-left: 250px;
       transition: margin-left 0.3s ease-in-out;
     }
-
     .content.collapsed {
       margin-left: 0;
     }
-
     /* Style for the active navigation link based on reference images */
     .nav-link.active {
-      background-color: #374151;
-      /* gray-700 */
+      background-color: #374151; /* gray-700 */
       color: #ffffff;
-      border-left: 4px solid #34d399;
-      /* green-400 */
+      border-left: 4px solid #34d399; /* green-400 */
     }
-
     .nav-link.active svg {
-      color: #34d399;
-      /* green-400 */
+        color: #34d399; /* green-400 */
     }
-
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
       }
-
       .sidebar.open {
         transform: translateX(0);
       }
-
       .content {
         margin-left: 0;
       }
-
       .content.collapsed {
         margin-left: 0;
       }
     }
   </style>
 </head>
-
 <body class="text-gray-200">
 
   <div class="sidebar">
     <div class="p-4 py-6 flex items-center justify-center">
-      <img src="static/image/Logo.png" alt="Netshield Logo" class="h-20">
+      <img src="/static/image/Logo.png" alt="Netshield Logo" class="h-20">
     </div>
     <nav class="mt-6">
-      <a href="#dashboard"
-        class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
-        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 17v-2a4 4 0 00-4-4H3s-1 0-1-1 1-4 6-4h1a4 4 0 004-4V3s0-1 1-1h4a1 1 0 011 1v2a4 4 0 004 4h1a1 1 0 011 1v1a4 4 0 00-4 4v2a1 1 0 01-1 1h-4a1 1 0 01-1-1z">
-          </path>
-        </svg>
+      <a href="#dashboard" class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H3s-1 0-1-1 1-4 6-4h1a4 4 0 004-4V3s0-1 1-1h4a1 1 0 011 1v2a4 4 0 004 4h1a1 1 0 011 1v1a4 4 0 00-4 4v2a1 1 0 01-1 1h-4a1 1 0 01-1-1z"></path></svg>
         Dashboard
       </a>
-      <a href="#alerts"
-        class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
-        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-          </path>
-        </svg>
+      <a href="#alerts" class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
         Alerts
       </a>
-      <a href="#historical"
-        class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
-        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
-          </path>
-        </svg>
+      <a href="#historical" class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+         <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
         Historical Data
       </a>
-      <a href="#settings"
-        class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
-        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z">
-          </path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-          </path>
-        </svg>
+      <a href="#settings" class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         Settings
       </a>
     </nav>
@@ -126,358 +84,200 @@
   <div class="content">
     <header class="bg-gray-900/50 backdrop-blur-sm sticky top-0 z-40 p-4 flex items-center">
       <button id="menuToggle" class="text-white mr-4">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
       </button>
       <h1 id="headerTitle" class="text-xl font-semibold">Dashboard</h1>
     </header>
 
     <main class="p-6">
-      <section id="dashboard">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div class="bg-gray-800 p-6 rounded-lg text-center">
-            <h3 class="text-sm font-semibold text-gray-400">Total Packets</h3>
-            <p class="text-4xl font-bold mt-2">100</p>
-          </div>
-          <div class="bg-gray-800 p-6 rounded-lg text-center">
-            <h3 class="text-sm font-semibold text-red-500">Threats Detected</h3>
-            <!-- 1. ADD THE ID HERE -->
-            <p id="threats-detected-p" class="text-4xl font-bold text-red-500 mt-2">3</p>
-          </div>
-          <div class="bg-gray-800 p-6 rounded-lg text-center">
-            <h3 class="text-sm font-semibold text-gray-400">Active Protocols</h3>
-            <p class="text-xl font-bold mt-4">IP: 3, UDP: 3, TCP: 4</p>
-          </div>
-        </div>
-        <div class="bg-gray-800 p-4 rounded-lg">
-          <h3 class="text-lg font-semibold mb-2 px-2">Traffic Analysis</h3>
-          <canvas id="trafficChart" height="120"></canvas>
-        </div>
-
-        <!-- 2. ADD THE PREDICTION BUTTONS HERE -->
-        <div class="mt-6 p-4 bg-gray-800 rounded-lg">
-          <h3 class="font-semibold mb-2 text-lg">Test Live Prediction</h3>
-          <p class="text-sm text-gray-400 mb-4">Simulate a packet and send it to the AI model for analysis.</p>
-          <button onclick="getPrediction('normal')"
-            class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors">Test
-            Normal Packet</button>
-          <button onclick="getPrediction('attack')"
-            class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Test Attack
-            Packet</button>
-        </div>
-      </section>
-
-      <section id="alerts" class="hidden">
-        <h2 class="text-lg font-semibold mb-4">Active Alerts <span
-            class="ml-2 text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-full">3 New</span></h2>
-        <!-- 1. ADD THE ID HERE -->
-        <div id="alerts-container" class="space-y-4">
-          <div class="bg-gray-800 p-4 rounded-lg flex justify-between items-center border-l-4 border-yellow-400">
-            <div>
-              <p class="font-semibold">Port Scan Detected</p>
-              <p class="text-sm text-gray-400">From IP 109.168.1.2 at 15:30</p>
+        <section id="dashboard">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-gray-800 p-6 rounded-lg text-center">
+              <h3 class="text-sm font-semibold text-gray-400">Total Packets</h3>
+              <p id="total-packets-p" class="text-4xl font-bold mt-2">0</p>
             </div>
-            <button
-              class="font-semibold text-sm bg-red-600/50 text-red-300 hover:bg-red-600/80 hover:text-white transition-colors px-3 py-1 rounded-md">Block
-              IP</button>
-          </div>
-          <div class="bg-gray-800 p-4 rounded-lg flex justify-between items-center border-l-4 border-red-500">
-            <div>
-              <p class="font-semibold">DDoS Detected</p>
-              <p class="text-sm text-gray-400">From IP 109.172.1.1 at 15:00</p>
+            <div class="bg-gray-800 p-6 rounded-lg text-center">
+              <h3 class="text-sm font-semibold text-red-500">Threats Detected</h3>
+              <p id="threats-detected-p" class="text-4xl font-bold text-red-500 mt-2">0</p>
             </div>
-            <button
-              class="font-semibold text-sm bg-red-600/50 text-red-300 hover:bg-red-600/80 hover:text-white transition-colors px-3 py-1 rounded-md">Block
-              IP</button>
-          </div>
-          <div class="bg-gray-800 p-4 rounded-lg flex justify-between items-center border-l-4 border-yellow-400">
-            <div>
-              <p class="font-semibold">Port Scan Detected</p>
-              <p class="text-sm text-gray-400">From IP 109.172.1.2 at 15:30</p>
-            </div>
-            <button
-              class="font-semibold text-sm bg-red-600/50 text-red-300 hover:bg-red-600/80 hover:text-white transition-colors px-3 py-1 rounded-md">Block
-              IP</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="historical" class="hidden">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-semibold">Historical Data</h2>
-          <button
-            class="font-semibold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors px-4 py-2 rounded-md">Export
-            Data</button>
-        </div>
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Threat Heatmap</h3>
-            <div class="flex items-center space-x-4">
-              <span class="flex items-center text-sm">
-                <div class="w-3 h-3 rounded-sm bg-green-500 mr-2"></div>Low
-              </span>
-              <span class="flex items-center text-sm">
-                <div class="w-3 h-3 rounded-sm bg-yellow-400 mr-2"></div>Medium
-              </span>
-              <span class="flex items-center text-sm">
-                <div class="w-3 h-3 rounded-sm bg-red-600 mr-2"></div>High
-              </span>
+            <div class="bg-gray-800 p-6 rounded-lg text-center">
+              <h3 class="text-sm font-semibold text-gray-400">Active Protocols</h3>
+              <p class="text-xl font-bold mt-4">IP: 0, UDP: 0, TCP: 0</p>
             </div>
           </div>
-          <div class="grid grid-cols-12 gap-2">
-            <div class="w-full h-8 bg-green-500/30 rounded-sm hover:border-white hover:border"
-              title="IP: 192.168.1.5, Attacks: 2"></div>
-            <div class="w-full h-8 bg-green-500/30 rounded-sm hover:border-white hover:border"></div>
-            <div class="w-full h-8 bg-yellow-400/50 rounded-sm hover:border-white hover:border"
-              title="IP: 192.168.1.15, Attacks: 25"></div>
-            <div class="w-full h-8 bg-red-600/80 rounded-sm hover:border-white hover:border"
-              title="IP: 192.168.1.22, Attacks: 78"></div>
-            <script>
-              for (let i = 0; i < 92; i++) {
-                const intensity = Math.random();
-                let colorClass = 'bg-green-500/30';
-                if (intensity > 0.9) colorClass = 'bg-red-600/80';
-                else if (intensity > 0.7) colorClass = 'bg-yellow-400/50';
-                document.write(`<div class="w-full h-8 ${colorClass} rounded-sm hover:border-white hover:border"></div>`);
-              }
-            </script>
+          <div class="bg-gray-800 p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2 px-2">Traffic Analysis</h3>
+            <canvas id="trafficChart" height="120"></canvas>
           </div>
-        </div>
-      </section>
+          
+          <!-- Buttons to test the prediction API -->
+          <div class="mt-6 p-4 bg-gray-800 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Test Prediction Engine</h3>
+            <p class="text-sm text-gray-400 mb-4">Simulate a packet and send it to the AI model for analysis.</p>
+            <button onclick="getPrediction('normal')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors">Test Normal Packet</button>
+            <button onclick="getPrediction('attack')" class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Test Attack Packet</button>
+          </div>
+        </section>
 
-      <section id="settings" class="hidden">
-        <h2 class="text-lg font-semibold mb-4">Settings</h2>
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <p>Settings panel coming soon...</p>
-        </div>
-      </section>
+        <section id="alerts" class="hidden">
+          <h2 class="text-lg font-semibold mb-4">Active Alerts</h2>
+          <div id="alerts-container" class="space-y-4">
+            <!-- Alerts will be dynamically added here by JavaScript -->
+          </div>
+        </section>
+
+        <section id="historical" class="hidden">
+           <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Historical Data</h2>
+                <button class="font-semibold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors px-4 py-2 rounded-md">Export Data</button>
+            </div>
+          <div class="bg-gray-800 p-6 rounded-lg">
+             <!-- ... (your heatmap code) ... -->
+          </div>
+        </section>
+        
+        <section id="settings" class="hidden">
+             <h2 class="text-lg font-semibold mb-4">Settings</h2>
+             <div class="bg-gray-800 p-6 rounded-lg">
+                <p>Settings panel coming soon...</p>
+             </div>
+        </section>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const content = document.querySelector('.content');
+        // --- (Your existing navigation and chart.js setup code goes here) ---
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
 
-      // Sidebar toggle for all screen sizes
-      function toggleSidebar() {
-        sidebar.classList.toggle('collapsed');
-        content.classList.toggle('collapsed');
-      }
-      menuToggle.addEventListener('click', toggleSidebar);
-
-      // Navigation and section handling
-      const navLinks = document.querySelectorAll('.nav-link');
-      const sections = document.querySelectorAll('main > section');
-      const headerTitle = document.getElementById('headerTitle');
-
-      function setActiveLink(targetLink) {
-        navLinks.forEach(link => link.classList.remove('active'));
-        targetLink.classList.add('active');
-      }
-
-      navLinks.forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          e.preventDefault();
-          const targetId = this.getAttribute('href');
-          const targetSection = document.querySelector(targetId);
-
-          sections.forEach(section => section.classList.add('hidden'));
-          targetSection.classList.remove('hidden');
-
-          headerTitle.textContent = this.textContent.trim();
-          setActiveLink(this);
-
-          // Close sidebar on navigation in mobile view
-          if (window.innerWidth < 768 && !sidebar.classList.contains('collapsed')) {
-            toggleSidebar();
-          }
-        });
-      });
-
-      // Set initial active state
-      setActiveLink(document.querySelector('.nav-link[href="#dashboard"]'));
-
-
-      // Chart.js for Traffic Graph
-      const ctx = document.getElementById('trafficChart').getContext('2d');
-      const trafficChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['16:15', '16:16', '16:17', '16:18', '16:19', '16:20'],
-          datasets: [{
-            label: 'Packets/sec',
-            data: [500, 1000, 1500, 800, 300, 200], // Using values like 1.5k -> 1500
-            borderColor: 'cyan',
-            backgroundColor: 'rgba(0, 255, 255, 0.1)',
-            fill: true,
-            tension: 0.4
-          }, {
-            label: 'Threats',
-            data: [0, 100, 1200, 500, 100, 0],
-            borderColor: 'red',
-            backgroundColor: 'rgba(255, 0, 0, 0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              labels: {
-                color: '#d1d5db' // gray-300
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                color: '#9ca3af', // gray-400
-                // Format ticks to show 'k' for thousands
-                callback: function (value, index, values) {
-                  if (value >= 1000) {
-                    return (value / 1000) + 'k';
-                  }
-                  return value;
-                }
-              },
-              grid: {
-                color: 'rgba(255, 255, 255, 0.1)'
-              }
-            },
-            x: {
-              ticks: {
-                color: '#9ca3af' // gray-400
-              },
-              grid: {
-                display: false
-              }
-            }
-          }
+        function toggleSidebar() {
+             sidebar.classList.toggle('collapsed');
+             content.classList.toggle('collapsed');
         }
-      });
+        menuToggle.addEventListener('click', toggleSidebar);
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('main > section');
+        const headerTitle = document.getElementById('headerTitle');
+
+        function setActiveLink(targetLink) {
+             navLinks.forEach(link => link.classList.remove('active'));
+             targetLink.classList.add('active');
+        }
+
+        navLinks.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+
+                sections.forEach(section => section.classList.add('hidden'));
+                targetSection.classList.remove('hidden');
+                
+                headerTitle.textContent = this.textContent.trim();
+                setActiveLink(this);
+                
+                if (window.innerWidth < 768 && !sidebar.classList.contains('collapsed')) {
+                    toggleSidebar();
+                }
+            });
+        });
+        
+        setActiveLink(document.querySelector('.nav-link[href="#dashboard"]'));
+
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['16:15', '16:16', '16:17', '16:18', '16:19', '16:20'],
+                datasets: [{
+                    label: 'Packets/sec', data: [500, 1000, 1500, 800, 300, 200],
+                    borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                    fill: true, tension: 0.4
+                }, {
+                    label: 'Threats', data: [0, 100, 1200, 500, 100, 0],
+                    borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    fill: true, tension: 0.4
+                }]
+            },
+            options: { /* ... (your chart options) ... */ }
+        });
     });
 
     // --- Backend Python Interaction ---
 
     async function getPrediction(packetType) {
-      // UI feedback
       console.log(`Sending sample "${packetType}" packet for analysis...`);
 
       try {
         const response = await fetch('/predict', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          // send type of packet to test ('normal' or 'attack')
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: packetType })
         });
 
         if (!response.ok) {
-          alert("Error: Could not connect to the prediction server");
+          alert("Error: Could not connect to the prediction server.");
           return;
         }
 
         const result = await response.json();
-        console.log('Prediction result:', result);
+        console.log('Prediction received:', result);
 
-        // Update UI with prediction result
+        // Update UI with the single prediction result
         updateDashboard(result);
+
       } catch (error) {
         console.error('Error during prediction:', error);
-        alert("Error: Could not connect to the prediction server");
+        alert("Failed to fetch prediction. Is the Flask server running?");
       }
     }
 
-    function updateDashboard(result) {
-      if (result.status === 'Anomaly') {
-        const threatsCounter = document.getElementById('threats-detected-p'); // Corrected ID
+    function updateDashboard(predictionResult) {
+      // This function now handles a single result object, not an array
+      
+      // Update Total Packets counter
+      const totalPacketsCounter = document.getElementById('total-packets-p');
+      if (totalPacketsCounter) {
+          let currentPackets = parseInt(totalPacketsCounter.textContent);
+          totalPacketsCounter.textContent = currentPackets + 1;
+      }
+
+      // Update Threats counter if it's an anomaly
+      if (predictionResult.status === 'Anomaly') {
+        const threatsCounter = document.getElementById('threats-detected-p');
         if (threatsCounter) {
           let currentThreats = parseInt(threatsCounter.textContent);
           threatsCounter.textContent = currentThreats + 1;
         }
       }
 
+      // Add a new alert to the alerts page
       const alertContainer = document.getElementById('alerts-container');
       if (alertContainer) {
         const newAlert = document.createElement('div');
-        const borderColor = result.status === 'Anomaly' ? 'border-red-500' : 'border-green-500';
-
-        // FIX 1: Use backticks (`) for the class name string
+        const borderColor = predictionResult.status === 'Anomaly' ? 'border-red-500' : 'border-green-500';
+        
+        // Correctly use template literals for the class name
         newAlert.className = `bg-gray-800 p-4 rounded-lg mb-2 border-l-4 ${borderColor}`;
 
         const statusText = document.createElement('p');
         statusText.className = 'font-semibold';
-
-        // FIX 2: Use backticks (`) for the status text
-        statusText.textContent = `Status: ${result.status}`;
+        statusText.textContent = `Status: ${predictionResult.status}`;
 
         const typeText = document.createElement('p');
         typeText.className = 'text-sm text-gray-400';
-        typeText.textContent = `Attack Type: ${result.attack_type || 'N/A'}`;
+        typeText.textContent = `Attack Type: ${predictionResult.attack_type || 'N/A' }`;
 
         newAlert.appendChild(statusText);
         newAlert.appendChild(typeText);
 
-        alertContainer.prepend(newAlert);
+        alertContainer.prepend(newAlert); // prepends the new alert to the top of the list
       }
-    }
-
-    setInterval(fetchLatestAlerts, 3000);
-
-    async function fetchLatestAlerts() {
-      try {
-        const response = await fetch('/get_alerts');
-        const alerts = await response.json();
-
-        updateDashboard(alerts);
-
-      } catch (error) {
-        console.error("Could not fetch new alerts:", error);
-      }
-    }
-
-    function updateDashboard(alerts) {
-      const alertsContainer = document.getElementById('alerts-container');
-      if (!alertsContainer) return;
-
-      // Clear the current list of alerts
-      alertsContainer.innerHTML = '';
-
-      // Update the threats counter
-      const threatsCounter = document.getElementById('threats-detected-p');
-      if (threatsCounter) {
-        threatsCounter.textContent = alerts.length;
-      }
-
-      // Add each new alert to the dashboard
-      alerts.forEach(alertData => {
-        const newAlert = document.createElement('div');
-        const borderColor = 'border-red-500'; // All alerts are anomalies
-        newAlert.className = `bg-gray-800 p-4 rounded-lg mb-2 border-l-4 ${borderColor}`;
-
-        const statusText = document.createElement('p');
-        statusText.className = 'font-semibold';
-        statusText.textContent = `Status: ${alertData.status}`;
-
-        const typeText = document.createElement('p');
-        typeText.className = 'text-sm text-gray-400';
-        typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A'}`;
-
-        newAlert.appendChild(statusText);
-        newAlert.appendChild(typeText);
-
-        alertsContainer.appendChild(newAlert);
-      });
     }
   </script>
 </body>
-
 </html>
