@@ -32,23 +32,25 @@ def dashboard():
 @app.route('/predict', methods=['POST'])
 def handle_prediction():
     """
-    Receives packet data from live_capture.py, runs the model,
-    and stores the result if it's an anomaly.
+    This is the API endpoint. It handles the simple 'type' requests 
+    from the test buttons on the dashboard.
     """
     data = request.get_json()
-    features = data.get('packet_features')
+    
+    # Check for the 'type' key sent from the front-end JavaScript
+    data_type = data.get('type')
+    
+    if data_type not in ['normal', 'attack']:
+        return jsonify({"error": "Invalid 'type' specified in request"}), 400
 
-    if not features:
-        return jsonify({"error": "Missing feature data"}), 400
-
-    sample_to_predict = np.array(features)
+    # Select which pre-loaded sample to use based on the button clicked
+    sample_to_predict = attack_sample if data_type == 'attack' else normal_sample
+    
+    # Get a prediction from our hybrid model
     prediction_result = predict_hybrid(sample_to_predict, rf_model, autoencoder, threshold, attack_mapping)
-
-    # If an anomaly is detected, add it to our list of recent alerts
-    if prediction_result['status'] == 'Anomaly':
-        recent_alerts.append(prediction_result)
-
-    return jsonify({"status": "received"}), 200
+    
+    # Return the result as a JSON object to the dashboard
+    return jsonify(prediction_result)
 
 
 # An endpoint for the front-end to get new alerts 
