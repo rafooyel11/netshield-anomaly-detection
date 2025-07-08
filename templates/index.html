@@ -363,6 +363,54 @@
         alertContainer.prepend(newAlert);
       }
     }
+
+    setInterval(fetchLatestAlerts, 3000);
+
+    async function fetchLatestAlerts() {
+        try {
+            const response = await fetch('/get_alerts');
+            const alerts = await response.json();
+
+            updateDashboard(alerts);
+
+        } catch (error) {
+            console.error("Could not fetch new alerts:", error);
+        }
+    }
+
+    function updateDashboard(alerts) {
+        const alertsContainer = document.getElementById('alerts-container');
+        if (!alertsContainer) return;
+
+        // Clear the current list of alerts
+        alertsContainer.innerHTML = '';
+
+        // Update the threats counter
+        const threatsCounter = document.getElementById('threats-detected-p');
+        if(threatsCounter) {
+            threatsCounter.textContent = alerts.length;
+        }
+
+        // Add each new alert to the dashboard
+        alerts.forEach(alertData => {
+            const newAlert = document.createElement('div');
+            const borderColor = 'border-red-500'; // All alerts are anomalies
+            newAlert.className = `bg-gray-800 p-4 rounded-lg mb-2 border-l-4 ${borderColor}`;
+            
+            const statusText = document.createElement('p');
+            statusText.className = 'font-semibold';
+            statusText.textContent = `Status: ${alertData.status}`;
+            
+            const typeText = document.createElement('p');
+            typeText.className = 'text-sm text-gray-400';
+            typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A' }`;
+
+            newAlert.appendChild(statusText);
+            newAlert.appendChild(typeText);
+            
+            alertsContainer.appendChild(newAlert);
+        });
+    }
   </script>
 </body>
 </html>
