@@ -102,7 +102,7 @@
             </div>
             <div class="bg-gray-800 p-6 rounded-lg text-center">
               <h3 class="text-sm font-semibold text-gray-400">Active Protocols</h3>
-              <p class="text-xl font-bold mt-4">IP: 0, UDP: 0, TCP: 0</p>
+              <p id="active-protocols-p" class="text-xl font-bold mt-4">IP: 0, UDP: 0, TCP: 0</p>
             </div>
           </div>
           <div class="bg-gray-800 p-4 rounded-lg">
@@ -110,20 +110,12 @@
             <canvas id="trafficChart" height="120"></canvas>
           </div>
           
-          <!-- Buttons to test the prediction API -->
-          <div class="mt-6 p-4 bg-gray-800 rounded-lg">
-            <h3 class="font-semibold mb-2 text-lg">Test Prediction Engine</h3>
-            <p class="text-sm text-gray-400 mb-4">Simulate a packet and send it to the AI model for analysis.</p>
-            <button onclick="getPrediction('normal')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors">Test Normal Packet</button>
-            <button onclick="getPrediction('attack')" class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Test Attack Packet</button>
-          </div>
         </section>
 
         <section id="alerts" class="hidden">
           <h2 class="text-lg font-semibold mb-4">Active Alerts</h2>
           <div id="alerts-container" class="space-y-4">
-            <!-- Alerts will be dynamically added here by JavaScript -->
-          </div>
+            </div>
         </section>
 
         <section id="historical" class="hidden">
@@ -132,8 +124,7 @@
                 <button class="font-semibold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors px-4 py-2 rounded-md">Export Data</button>
             </div>
           <div class="bg-gray-800 p-6 rounded-lg">
-             <!-- ... (your heatmap code) ... -->
-          </div>
+             </div>
         </section>
         
         <section id="settings" class="hidden">
@@ -148,52 +139,34 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- (Your existing navigation setup code remains the same) ---
+        // --- Navigation and Chart.js setup ---
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.querySelector('.sidebar');
         const content = document.querySelector('.content');
-
-        function toggleSidebar() {
-             sidebar.classList.toggle('collapsed');
-             content.classList.toggle('collapsed');
-        }
+        function toggleSidebar() { sidebar.classList.toggle('collapsed'); content.classList.toggle('collapsed'); }
         menuToggle.addEventListener('click', toggleSidebar);
-
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('main > section');
         const headerTitle = document.getElementById('headerTitle');
-
-        function setActiveLink(targetLink) {
-             navLinks.forEach(link => link.classList.remove('active'));
-             targetLink.classList.add('active');
-        }
-
+        function setActiveLink(targetLink) { navLinks.forEach(link => link.classList.remove('active')); targetLink.classList.add('active'); }
         navLinks.forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href');
                 const targetSection = document.querySelector(targetId);
-
                 sections.forEach(section => section.classList.add('hidden'));
                 targetSection.classList.remove('hidden');
-                
                 headerTitle.textContent = this.textContent.trim();
                 setActiveLink(this);
-                
-                if (window.innerWidth < 768 && !sidebar.classList.contains('collapsed')) {
-                    toggleSidebar();
-                }
+                if (window.innerWidth < 768 && !sidebar.classList.contains('collapsed')) { toggleSidebar(); }
             });
         });
-        
         setActiveLink(document.querySelector('.nav-link[href="#dashboard"]'));
-
-        // --- Chart.js Setup ---
         const ctx = document.getElementById('trafficChart').getContext('2d');
         const trafficChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Start with empty labels
+                labels: [],
                 datasets: [{
                     label: 'Packets/sec', data: [],
                     borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
@@ -204,14 +177,11 @@
                     fill: true, tension: 0.4
                 }]
             },
-            options: { /* ... (your chart options) ... */ }
+            options: { /* ... Your Chart.js options ... */ }
         });
 
-        // --- NEW: Live Update Logic ---
-        
-        // This function will run every 3 seconds to get new data
-        setInterval(fetchDashboardData, 3000);
-
+        // --- Live Update Logic ---
+        setInterval(fetchDashboardData, 3000); // Poll server every 3 seconds
         let lastTotalPackets = 0;
 
         async function fetchDashboardData() {
@@ -228,7 +198,6 @@
             // Update Stats Cards
             document.getElementById('total-packets-p').textContent = data.stats.total;
             document.getElementById('threats-detected-p').textContent = data.alerts.length;
-            // The 'IP' count is just the total for this demo
             document.getElementById('active-protocols-p').textContent = `IP: ${data.stats.total}, UDP: ${data.stats.UDP}, TCP: ${data.stats.TCP}`;
 
             // Update Alerts List
@@ -238,15 +207,12 @@
                 data.alerts.forEach(alertData => {
                     const newAlert = document.createElement('div');
                     newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500';
-                    
                     const statusText = document.createElement('p');
                     statusText.className = 'font-semibold';
                     statusText.textContent = `Status: ${alertData.status} at ${alertData.timestamp}`;
-                    
                     const typeText = document.createElement('p');
                     typeText.className = 'text-sm text-gray-400';
                     typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A'}`;
-
                     newAlert.appendChild(statusText);
                     newAlert.appendChild(typeText);
                     alertsContainer.appendChild(newAlert);
@@ -256,16 +222,12 @@
             // Update Chart
             const now = new Date();
             const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            
             const packetsInLastInterval = data.stats.total - lastTotalPackets;
             lastTotalPackets = data.stats.total;
 
-            // Add new data and remove old data to keep the chart moving
             if (trafficChart.data.labels.length > 20) {
                 trafficChart.data.labels.shift();
-                trafficChart.data.datasets.forEach((dataset) => {
-                    dataset.data.shift();
-                });
+                trafficChart.data.datasets.forEach((dataset) => { dataset.data.shift(); });
             }
             
             trafficChart.data.labels.push(timeLabel);
