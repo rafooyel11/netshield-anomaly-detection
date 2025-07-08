@@ -31,10 +31,6 @@ def dashboard():
 #  The /predict route now handles live data 
 @app.route('/predict', methods=['POST'])
 def handle_prediction():
-    """
-    This is the API endpoint. It handles the simple 'type' requests 
-    from the test buttons on the dashboard.
-    """
     data = request.get_json()
     
     # Check for the 'type' key sent from the front-end JavaScript
