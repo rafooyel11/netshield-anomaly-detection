@@ -1,24 +1,37 @@
 import joblib
 import json
 import numpy as np
+import os
 from tensorflow import keras
 
 # --- 1. Load All Models and Configuration on Startup ---
 def load_all_models():
     """Loads all saved models and config files into memory."""
     print("Loading models and configuration...")
-    rf_model = joblib.load('random_forest_model.joblib')
-    autoencoder_model = keras.models.load_model('autoencoder_model.h5')
-    
-    with open('anomaly_threshold.txt', 'r') as f:
+
+    # get directory of this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+   # get the main project directory
+    project_dir = os.path.dirname(script_dir)
+
+    # -- define correct, full paths to saved models and config files
+    rf_path = os.path.join(project_dir, 'models', 'random_forest_model.joblib') 
+    autoencoder_path = os.path.join(project_dir, 'models', 'autoencoder_model.h5')
+    threshold_path = os.path.join(project_dir, 'models', 'anomaly_threshold.txt')
+    mapping_path = os.path.join(project_dir, 'models', 'attack_mapping.json')
+
+    # load the files using their paths
+    rf_model = joblib.load(rf_path)
+    autoencoder_model = keras.models.load_model(autoencoder_path)
+
+    with open(threshold_path, 'r') as f:
         threshold = float(f.read())
-        
-    with open('attack_mapping.json', 'r') as f:
-        # JSON saves keys as strings, so we convert them back to integers
+
+    with open(mapping_path, 'r') as f:
         mapping_str_keys = json.load(f)
-        attack_mapping = {int(k): v for k,v in mapping_str_keys.items()}
-        
-    print("All components loaded successfully.")
+        attack_mapping = {int(k): v for k, v in mapping_str_keys.items()}
+
+    print("Models and configuration loaded successfully.")
     return rf_model, autoencoder_model, threshold, attack_mapping
 
 # --- 2. The Two-Stage Hybrid Prediction Function ---
