@@ -98,7 +98,8 @@
             </div>
             <div class="bg-gray-800 p-6 rounded-lg text-center">
               <h3 class="text-sm font-semibold text-red-500">Threats Detected</h3>
-              <p class="text-4xl font-bold text-red-500 mt-2">3</p>
+              <!-- 1. ADD THE ID HERE -->
+              <p id="threats-detected-p" class="text-4xl font-bold text-red-500 mt-2">3</p>
             </div>
             <div class="bg-gray-800 p-6 rounded-lg text-center">
               <h3 class="text-sm font-semibold text-gray-400">Active Protocols</h3>
@@ -109,11 +110,20 @@
             <h3 class="text-lg font-semibold mb-2 px-2">Traffic Analysis</h3>
             <canvas id="trafficChart" height="120"></canvas>
           </div>
+
+          <!-- 2. ADD THE PREDICTION BUTTONS HERE -->
+          <div class="mt-6 p-4 bg-gray-800 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Test Live Prediction</h3>
+            <p class="text-sm text-gray-400 mb-4">Simulate a packet and send it to the AI model for analysis.</p>
+            <button onclick="getPrediction('normal')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-colors">Test Normal Packet</button>
+            <button onclick="getPrediction('attack')" class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Test Attack Packet</button>
+          </div>
         </section>
 
         <section id="alerts" class="hidden">
           <h2 class="text-lg font-semibold mb-4">Active Alerts <span class="ml-2 text-xs font-bold text-white bg-red-600 px-2 py-1 rounded-full">3 New</span></h2>
-          <div class="space-y-4">
+          <!-- 1. ADD THE ID HERE -->
+          <div id="alerts-container" class="space-y-4">
             <div class="bg-gray-800 p-4 rounded-lg flex justify-between items-center border-l-4 border-yellow-400">
                 <div>
                     <p class="font-semibold">Port Scan Detected</p>
@@ -287,6 +297,72 @@
             }
         });
     });
+
+    // --- Backend Python Interaction ---
+
+    async function getPrediction(packetType) {
+      // UI feedback
+      console.log(`Sending sample "${packetType}" packet for analysis...`);
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'     
+          },
+          // send type of packet to test ('normal' or 'attack')
+          body: JSON.stringify({ type: packetType })
+        });
+
+        if (!response.ok) {
+          alert("Error: Could not connect to the prediction server");
+          return;
+        }
+
+        const result = await response.json();
+        console.log('Prediction result:', result);
+
+        // Update UI with prediction result
+        updateDashboard(result);
+      } catch (error) {
+        console.error('Error during prediction:', error);
+        alert("Error: Could not connect to the prediction server");
+      }
+    }
+
+    function updateDashboard(result) {
+      // Update the threats counter
+      if (result.status === 'Anomaly') {
+        const threatsCounter = document.getElementById('threats-detected-p');
+        if (threatsCounter) {
+          let currentThreats = parseInt(threatsCounter.textContent);
+          threatsCounter.textContent = currentThreats + 1;
+        }
+      }
+
+      // Add a new alert to the alerts page
+      const alertContainer = document.getElementById('alerts-container');
+      if (alertContainer) {
+        const newAlert = document.createElement('div');
+        const borderColor = result.status === 'Anomaly' ? 'border-red-500' : 'border-green-500';
+        // Correctly use template literals for the class name
+        newAlert.className = `bg-gray-800 p-4 rounded-lg mb-2 border-l-4 ${borderColor}`;
+
+        const statusText = document.createElement('p');
+        statusText.className = 'font-semibold';
+        // Correctly set the text content
+        statusText.textContent = `Status: ${result.status}`;
+
+        const typeText = document.createElement('p');
+        typeText.className = 'text-sm text-gray-400';
+        typeText.textContent = `Attack Type: ${result.attack_type || 'N/A' }`;
+
+        newAlert.appendChild(statusText);
+        newAlert.appendChild(typeText);
+
+        alertContainer.prepend(newAlert);
+      }
+    }
   </script>
 </body>
 </html>
