@@ -37,29 +37,47 @@ def dashboard():
 #  The /predict route now handles live data 
 @app.route('/predict', methods=['POST'])
 def handle_prediction():
+    global threats_in_last_interval
     data = request.get_json()
-    features = data.get('packet_features')
-    protocol = data.get('protocol', 'Other') # Get the protocol from the live capture
+    
+    # Logic for live packet data
+    if 'packet_features' in data:
+        features = data.get('packet_features')
+        protocol = data.get('protocol', 'Other')
 
-    if not features:
-        return jsonify({"error": "Missing feature data"}), 400
+        packet_stats["total"] += 1
+        if protocol in packet_stats:
+            packet_stats[protocol] += 1
+        else:
+            packet_stats["Other"] += 1
+        
+        sample_to_predict = np.array(features)
+        prediction_result = predict_hybrid(sample_to_predict, rf_model, autoencoder, threshold, attack_mapping)
 
-    # Update packet statistics
-    packet_stats["total"] += 1
-    if protocol in packet_stats:
-        packet_stats[protocol] += 1
-    else:
-        packet_stats["Other"] += 1
+        if prediction_result['status'] == 'Anomaly':
+            prediction_result['timestamp'] = datetime.now().strftime("%H:%M:%S")
+            recent_alerts.appendleft(prediction_result)
+            threats_in_last_interval += 1
+        
+        return jsonify({"status": "live packet received"}), 200
 
-    sample_to_predict = np.array(features)
-    prediction_result = predict_hybrid(sample_to_predict, rf_model, autoencoder, threshold, attack_mapping)
+    # Logic for simulation buttons
+    elif 'type' in data:
+        _, _, x_test, y_test = load_and_prepare_data()
+        normal_sample = x_test.loc[y_test[y_test == 16].index[0]].to_numpy()
+        attack_sample = x_test.loc[y_test[y_test != 16].index[0]].to_numpy()
+        
+        data_type = data.get('type')
+        sample_to_predict = attack_sample if data_type == 'attack' else normal_sample
+        prediction_result = predict_hybrid(sample_to_predict, rf_model, autoencoder, threshold, attack_mapping)
+        
+        if prediction_result['status'] == 'Anomaly':
+            prediction_result['timestamp'] = datetime.now().strftime("%H:%M:%S")
+            recent_alerts.appendleft(prediction_result)
 
-    # If an anomaly is detected, add it to our list of recent alerts
-    if prediction_result['status'] == 'Anomaly':
-        prediction_result['timestamp'] = datetime.now().strftime("%H:%M:%S")
-        recent_alerts.appendleft(prediction_result) # Add to the beginning of the list
+        return jsonify(prediction_result)
 
-    return jsonify({"status": "received"}), 200
+    return jsonify({"error": "Invalid request format"}), 400
 
 
 # An endpoint for the front-end to get new alerts 
@@ -71,11 +89,15 @@ def get_alerts():
 # An endpoint to get the dashboard data including recent alerts and stats
 @app.route('/get_dashboard_data')
 def get_dashboard_data():
-    """Provides the list of recent alerts and stats to the dashboard."""
-    return jsonify({
+    global threats_in_last_interval
+    data_to_send = {
         "alerts": list(recent_alerts),
-        "stats": packet_stats
-    })
+        "stats": packet_stats,
+        "threats_this_interval": threats_in_last_interval
+    }
+    # Reset the interval counter after sending it
+    threats_in_last_interval = 0
+    return jsonify(data_to_send)
 
 # run flask app
 if __name__ == '__main__':

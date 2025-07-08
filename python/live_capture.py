@@ -39,11 +39,11 @@ def process_and_predict(packet):
         print(f"Could not connect to the server: {e}")
 
 # --- Start Live Capture ---
-print("Starting live network capture on 'Ethernet 2'...")
+print("Starting live network capture on 'Ethernet'...")
 print("Press Ctrl+C to stop.")
 
 # Use sniff_continuously() which runs indefinitely
-capture = pyshark.LiveCapture(interface='Ethernet 2')
+capture = pyshark.LiveCapture(interface='Ethernet')
 
 for packet in capture.sniff_continuously():
     # This loop will run for each packet that is captured

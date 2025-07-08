@@ -139,7 +139,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- Navigation and Chart.js setup ---
+        // --- (Your existing navigation and chart setup code) ---
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.querySelector('.sidebar');
         const content = document.querySelector('.content');
@@ -168,11 +168,11 @@
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Packets/sec', data: [],
+                    label: 'Packets/Interval', data: [],
                     borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
                     fill: true, tension: 0.4
                 }, {
-                    label: 'Threats Detected', data: [],
+                    label: 'Threats/Interval', data: [],
                     borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)',
                     fill: true, tension: 0.4
                 }]
@@ -181,7 +181,7 @@
         });
 
         // --- Live Update Logic ---
-        setInterval(fetchDashboardData, 3000); // Poll server every 3 seconds
+        setInterval(fetchDashboardData, 3000);
         let lastTotalPackets = 0;
 
         async function fetchDashboardData() {
@@ -203,7 +203,7 @@
             // Update Alerts List
             const alertsContainer = document.getElementById('alerts-container');
             if (alertsContainer) {
-                alertsContainer.innerHTML = ''; // Clear old alerts
+                alertsContainer.innerHTML = '';
                 data.alerts.forEach(alertData => {
                     const newAlert = document.createElement('div');
                     newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500';
@@ -227,15 +227,35 @@
 
             if (trafficChart.data.labels.length > 20) {
                 trafficChart.data.labels.shift();
-                trafficChart.data.datasets.forEach((dataset) => { dataset.data.shift(); });
+                trafficChart.data.datasets.forEach(dataset => dataset.data.shift());
             }
             
             trafficChart.data.labels.push(timeLabel);
-            trafficChart.data.datasets[0].data.push(packetsInLastInterval); 
-            trafficChart.data.datasets[1].data.push(data.alerts.length);
+            trafficChart.data.datasets[0].data.push(packetsInLastInterval);
+            // --- FIX: Use the new threats_this_interval value ---
+            trafficChart.data.datasets[1].data.push(data.threats_this_interval);
             trafficChart.update();
         }
     });
-  </script>
+
+    // --- Simulation Button Logic (no changes needed) ---
+    async function getPrediction(packetType) {
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: packetType }),
+            });
+            if (!response.ok) {
+                alert("Error: Could not connect to the prediction server.");
+                return;
+            }
+            // The dashboard will update automatically on the next interval
+        } catch (error) {
+            console.error('Error during prediction:', error);
+            alert("Failed to fetch prediction. Is the Flask server running?");
+        }
+    }
+</script>
 </body>
 </html>
