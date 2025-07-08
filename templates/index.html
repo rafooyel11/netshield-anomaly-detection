@@ -145,10 +145,10 @@
     </main>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- (Your existing navigation and chart.js setup code goes here) ---
+        // --- (Your existing navigation setup code remains the same) ---
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.querySelector('.sidebar');
         const content = document.querySelector('.content');
@@ -188,96 +188,92 @@
         
         setActiveLink(document.querySelector('.nav-link[href="#dashboard"]'));
 
+        // --- Chart.js Setup ---
         const ctx = document.getElementById('trafficChart').getContext('2d');
         const trafficChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['16:15', '16:16', '16:17', '16:18', '16:19', '16:20'],
+                labels: [], // Start with empty labels
                 datasets: [{
-                    label: 'Packets/sec', data: [500, 1000, 1500, 800, 300, 200],
+                    label: 'Packets/sec', data: [],
                     borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
                     fill: true, tension: 0.4
                 }, {
-                    label: 'Threats', data: [0, 100, 1200, 500, 100, 0],
+                    label: 'Threats Detected', data: [],
                     borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)',
                     fill: true, tension: 0.4
                 }]
             },
             options: { /* ... (your chart options) ... */ }
         });
-    });
 
-    // --- Backend Python Interaction ---
-
-    async function getPrediction(packetType) {
-      console.log(`Sending sample "${packetType}" packet for analysis...`);
-
-      try {
-        const response = await fetch('/predict', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: packetType })
-        });
-
-        if (!response.ok) {
-          alert("Error: Could not connect to the prediction server.");
-          return;
-        }
-
-        const result = await response.json();
-        console.log('Prediction received:', result);
-
-        // Update UI with the single prediction result
-        updateDashboard(result);
-
-      } catch (error) {
-        console.error('Error during prediction:', error);
-        alert("Failed to fetch prediction. Is the Flask server running?");
-      }
-    }
-
-    function updateDashboard(predictionResult) {
-      // This function now handles a single result object, not an array
-      
-      // Update Total Packets counter
-      const totalPacketsCounter = document.getElementById('total-packets-p');
-      if (totalPacketsCounter) {
-          let currentPackets = parseInt(totalPacketsCounter.textContent);
-          totalPacketsCounter.textContent = currentPackets + 1;
-      }
-
-      // Update Threats counter if it's an anomaly
-      if (predictionResult.status === 'Anomaly') {
-        const threatsCounter = document.getElementById('threats-detected-p');
-        if (threatsCounter) {
-          let currentThreats = parseInt(threatsCounter.textContent);
-          threatsCounter.textContent = currentThreats + 1;
-        }
-      }
-
-      // Add a new alert to the alerts page
-      const alertContainer = document.getElementById('alerts-container');
-      if (alertContainer) {
-        const newAlert = document.createElement('div');
-        const borderColor = predictionResult.status === 'Anomaly' ? 'border-red-500' : 'border-green-500';
+        // --- NEW: Live Update Logic ---
         
-        // Correctly use template literals for the class name
-        newAlert.className = `bg-gray-800 p-4 rounded-lg mb-2 border-l-4 ${borderColor}`;
+        // This function will run every 3 seconds to get new data
+        setInterval(fetchDashboardData, 3000);
 
-        const statusText = document.createElement('p');
-        statusText.className = 'font-semibold';
-        statusText.textContent = `Status: ${predictionResult.status}`;
+        let lastTotalPackets = 0;
 
-        const typeText = document.createElement('p');
-        typeText.className = 'text-sm text-gray-400';
-        typeText.textContent = `Attack Type: ${predictionResult.attack_type || 'N/A' }`;
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/get_dashboard_data');
+                const data = await response.json();
+                updateDashboardUI(data);
+            } catch (error) {
+                console.error("Could not fetch dashboard data:", error);
+            }
+        }
 
-        newAlert.appendChild(statusText);
-        newAlert.appendChild(typeText);
+        function updateDashboardUI(data) {
+            // Update Stats Cards
+            document.getElementById('total-packets-p').textContent = data.stats.total;
+            document.getElementById('threats-detected-p').textContent = data.alerts.length;
+            // The 'IP' count is just the total for this demo
+            document.getElementById('active-protocols-p').textContent = `IP: ${data.stats.total}, UDP: ${data.stats.UDP}, TCP: ${data.stats.TCP}`;
 
-        alertContainer.prepend(newAlert); // prepends the new alert to the top of the list
-      }
-    }
+            // Update Alerts List
+            const alertsContainer = document.getElementById('alerts-container');
+            if (alertsContainer) {
+                alertsContainer.innerHTML = ''; // Clear old alerts
+                data.alerts.forEach(alertData => {
+                    const newAlert = document.createElement('div');
+                    newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500';
+                    
+                    const statusText = document.createElement('p');
+                    statusText.className = 'font-semibold';
+                    statusText.textContent = `Status: ${alertData.status} at ${alertData.timestamp}`;
+                    
+                    const typeText = document.createElement('p');
+                    typeText.className = 'text-sm text-gray-400';
+                    typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A'}`;
+
+                    newAlert.appendChild(statusText);
+                    newAlert.appendChild(typeText);
+                    alertsContainer.appendChild(newAlert);
+                });
+            }
+
+            // Update Chart
+            const now = new Date();
+            const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            const packetsInLastInterval = data.stats.total - lastTotalPackets;
+            lastTotalPackets = data.stats.total;
+
+            // Add new data and remove old data to keep the chart moving
+            if (trafficChart.data.labels.length > 20) {
+                trafficChart.data.labels.shift();
+                trafficChart.data.datasets.forEach((dataset) => {
+                    dataset.data.shift();
+                });
+            }
+            
+            trafficChart.data.labels.push(timeLabel);
+            trafficChart.data.datasets[0].data.push(packetsInLastInterval); 
+            trafficChart.data.datasets[1].data.push(data.alerts.length);
+            trafficChart.update();
+        }
+    });
   </script>
 </body>
 </html>
