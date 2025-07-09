@@ -75,7 +75,7 @@
         Historical Data
       </a>
       <a href="#settings" class="nav-link flex items-center px-6 py-4 text-gray-300 hover:bg-gray-700 transition-colors duration-200">
-        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         Settings
       </a>
     </nav>
@@ -109,29 +109,21 @@
             <h3 class="text-lg font-semibold mb-2 px-2">Traffic Analysis</h3>
             <canvas id="trafficChart" height="120"></canvas>
           </div>
-          
         </section>
 
         <section id="alerts" class="hidden">
           <h2 class="text-lg font-semibold mb-4">Active Alerts</h2>
           <div id="alerts-container" class="space-y-4">
-            </div>
+            <!-- Alerts will be dynamically added here -->
+          </div>
         </section>
 
         <section id="historical" class="hidden">
-           <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Historical Data</h2>
-                <button class="font-semibold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors px-4 py-2 rounded-md">Export Data</button>
-            </div>
-          <div class="bg-gray-800 p-6 rounded-lg">
-             </div>
+           <!-- ... (your historical data content) ... -->
         </section>
         
         <section id="settings" class="hidden">
-             <h2 class="text-lg font-semibold mb-4">Settings</h2>
-             <div class="bg-gray-800 p-6 rounded-lg">
-                <p>Settings panel coming soon...</p>
-             </div>
+             <!-- ... (your settings content) ... -->
         </section>
     </main>
   </div>
@@ -165,22 +157,15 @@
         const ctx = document.getElementById('trafficChart').getContext('2d');
         const trafficChart = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Packets/Interval', data: [],
-                    borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                    fill: true, tension: 0.4
-                }, {
-                    label: 'Threats/Interval', data: [],
-                    borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                    fill: true, tension: 0.4
-                }]
-            },
+            data: { labels: [], datasets: [{ label: 'Packets/sec', data: [], borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)', fill: true, tension: 0.4 }, { label: 'Threats/sec', data: [], borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)', fill: true, tension: 0.4 }] },
             options: { /* ... Your Chart.js options ... */ }
         });
 
         // --- Live Update Logic ---
+        
+        // --- ADDITION: A Set to store the state of blocked alerts ---
+        const blockedAlerts = new Set();
+
         setInterval(fetchDashboardData, 3000);
         let lastTotalPackets = 0;
 
@@ -203,18 +188,41 @@
             // Update Alerts List
             const alertsContainer = document.getElementById('alerts-container');
             if (alertsContainer) {
-                alertsContainer.innerHTML = '';
+                alertsContainer.innerHTML = ''; // Clear old alerts
                 data.alerts.forEach(alertData => {
                     const newAlert = document.createElement('div');
-                    newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500';
+                    newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500 flex justify-between items-center';
+                    
+                    const textContainer = document.createElement('div');
                     const statusText = document.createElement('p');
                     statusText.className = 'font-semibold';
                     statusText.textContent = `Status: ${alertData.status} at ${alertData.timestamp}`;
+                    
                     const typeText = document.createElement('p');
                     typeText.className = 'text-sm text-gray-400';
                     typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A'}`;
-                    newAlert.appendChild(statusText);
-                    newAlert.appendChild(typeText);
+
+                    textContainer.appendChild(statusText);
+                    textContainer.appendChild(typeText);
+
+                    const blockButton = document.createElement('button');
+                    const alertId = `${alertData.attack_type}-${alertData.timestamp}`; // Create a unique ID for the alert
+
+                    // --- REVISED: Check if this alert is in our blocked set ---
+                    if (blockedAlerts.has(alertId)) {
+                        // If it's blocked, create the button in the "Blocked" state
+                        blockButton.textContent = 'Blocked';
+                        blockButton.disabled = true;
+                        blockButton.className = 'font-semibold text-sm bg-gray-500 text-gray-300 cursor-not-allowed px-3 py-1 rounded-md';
+                    } else {
+                        // Otherwise, create it in the normal "Block IP" state
+                        blockButton.className = 'font-semibold text-sm bg-red-600/50 text-red-300 hover:bg-red-600/80 hover:text-white transition-colors px-3 py-1 rounded-md';
+                        blockButton.textContent = 'Block IP';
+                        blockButton.onclick = function() { blockIp(this, alertId); };
+                    }
+
+                    newAlert.appendChild(textContainer);
+                    newAlert.appendChild(blockButton);
                     alertsContainer.appendChild(newAlert);
                 });
             }
@@ -224,38 +232,31 @@
             const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
             const packetsInLastInterval = data.stats.total - lastTotalPackets;
             lastTotalPackets = data.stats.total;
-
             if (trafficChart.data.labels.length > 20) {
                 trafficChart.data.labels.shift();
                 trafficChart.data.datasets.forEach(dataset => dataset.data.shift());
             }
-            
             trafficChart.data.labels.push(timeLabel);
             trafficChart.data.datasets[0].data.push(packetsInLastInterval);
-            // --- FIX: Use the new threats_this_interval value ---
-            trafficChart.data.datasets[1].data.push(data.threats_this_interval);
+            trafficChart.data.datasets[1].data.push(data.alerts.length);
             trafficChart.update();
         }
-    });
 
-    // --- Simulation Button Logic (no changes needed) ---
-    async function getPrediction(packetType) {
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: packetType }),
-            });
-            if (!response.ok) {
-                alert("Error: Could not connect to the prediction server.");
-                return;
-            }
-            // The dashboard will update automatically on the next interval
-        } catch (error) {
-            console.error('Error during prediction:', error);
-            alert("Failed to fetch prediction. Is the Flask server running?");
+        // --- REVISED: The blockIp function now remembers the state ---
+        function blockIp(buttonElement, alertId) {
+            // Add the alert's unique ID to our set of blocked alerts
+            blockedAlerts.add(alertId);
+
+            // Change button appearance to give user feedback
+            buttonElement.textContent = 'Blocked';
+            buttonElement.disabled = true;
+            buttonElement.classList.remove('bg-red-600/50', 'hover:bg-red-600/80');
+            buttonElement.classList.add('bg-gray-500', 'cursor-not-allowed');
+
+            // The alert() is optional now, as the UI state provides feedback
+            // alert("The IP has been blocked (simulation).");
         }
-    }
-</script>
+    });
+  </script>
 </body>
 </html>
