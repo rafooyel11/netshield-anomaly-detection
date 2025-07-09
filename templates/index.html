@@ -119,11 +119,34 @@
         </section>
 
         <section id="historical" class="hidden">
-           <!-- ... (your historical data content) ... -->
+           <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Historical Alerts Log</h2>
+                <button onclick="fetchHistoricalData()" class="font-semibold text-sm bg-blue-600 hover:bg-blue-500 text-white transition-colors px-4 py-2 rounded-md">
+                    Refresh Data
+                </button>
+           </div>
+          <div class="bg-gray-800 p-6 rounded-lg">
+             <table class="w-full text-left">
+                <thead class="border-b border-gray-600">
+                    <tr>
+                        <th class="p-2">Timestamp</th>
+                        <th class="p-2">Status</th>
+                        <th class="p-2">Attack Type</th>
+                        <th class="p-2">MSE Score</th>
+                    </tr>
+                </thead>
+                <tbody id="historical-data-body">
+                    <!-- Historical data will be dynamically inserted here -->
+                </tbody>
+             </table>
+          </div>
         </section>
         
         <section id="settings" class="hidden">
-             <!-- ... (your settings content) ... -->
+             <h2 class="text-lg font-semibold mb-4">Settings</h2>
+             <div class="bg-gray-800 p-6 rounded-lg">
+                <p>Settings panel coming soon...</p>
+             </div>
         </section>
     </main>
   </div>
@@ -131,7 +154,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // --- (Your existing navigation and chart setup code) ---
+        // --- Navigation and Chart.js setup ---
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.querySelector('.sidebar');
         const content = document.querySelector('.content');
@@ -157,15 +180,23 @@
         const ctx = document.getElementById('trafficChart').getContext('2d');
         const trafficChart = new Chart(ctx, {
             type: 'line',
-            data: { labels: [], datasets: [{ label: 'Packets/sec', data: [], borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)', fill: true, tension: 0.4 }, { label: 'Threats/sec', data: [], borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)', fill: true, tension: 0.4 }] },
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Packets/Interval', data: [],
+                    borderColor: 'cyan', backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                    fill: true, tension: 0.4
+                }, {
+                    label: 'Threats/Interval', data: [],
+                    borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    fill: true, tension: 0.4
+                }]
+            },
             options: { /* ... Your Chart.js options ... */ }
         });
 
         // --- Live Update Logic ---
-        
-        // --- ADDITION: A Set to store the state of blocked alerts ---
         const blockedAlerts = new Set();
-
         setInterval(fetchDashboardData, 3000);
         let lastTotalPackets = 0;
 
@@ -188,39 +219,30 @@
             // Update Alerts List
             const alertsContainer = document.getElementById('alerts-container');
             if (alertsContainer) {
-                alertsContainer.innerHTML = ''; // Clear old alerts
+                alertsContainer.innerHTML = '';
                 data.alerts.forEach(alertData => {
                     const newAlert = document.createElement('div');
                     newAlert.className = 'bg-gray-800 p-4 rounded-lg mb-2 border-l-4 border-red-500 flex justify-between items-center';
-                    
                     const textContainer = document.createElement('div');
                     const statusText = document.createElement('p');
                     statusText.className = 'font-semibold';
                     statusText.textContent = `Status: ${alertData.status} at ${alertData.timestamp}`;
-                    
                     const typeText = document.createElement('p');
                     typeText.className = 'text-sm text-gray-400';
                     typeText.textContent = `Attack Type: ${alertData.attack_type || 'N/A'}`;
-
                     textContainer.appendChild(statusText);
                     textContainer.appendChild(typeText);
-
                     const blockButton = document.createElement('button');
-                    const alertId = `${alertData.attack_type}-${alertData.timestamp}`; // Create a unique ID for the alert
-
-                    // --- REVISED: Check if this alert is in our blocked set ---
+                    const alertId = `${alertData.attack_type}-${alertData.timestamp}`;
                     if (blockedAlerts.has(alertId)) {
-                        // If it's blocked, create the button in the "Blocked" state
                         blockButton.textContent = 'Blocked';
                         blockButton.disabled = true;
                         blockButton.className = 'font-semibold text-sm bg-gray-500 text-gray-300 cursor-not-allowed px-3 py-1 rounded-md';
                     } else {
-                        // Otherwise, create it in the normal "Block IP" state
                         blockButton.className = 'font-semibold text-sm bg-red-600/50 text-red-300 hover:bg-red-600/80 hover:text-white transition-colors px-3 py-1 rounded-md';
                         blockButton.textContent = 'Block IP';
                         blockButton.onclick = function() { blockIp(this, alertId); };
                     }
-
                     newAlert.appendChild(textContainer);
                     newAlert.appendChild(blockButton);
                     alertsContainer.appendChild(newAlert);
@@ -238,25 +260,60 @@
             }
             trafficChart.data.labels.push(timeLabel);
             trafficChart.data.datasets[0].data.push(packetsInLastInterval);
-            trafficChart.data.datasets[1].data.push(data.alerts.length);
+            trafficChart.data.datasets[1].data.push(data.threats_this_interval);
             trafficChart.update();
         }
 
-        // --- REVISED: The blockIp function now remembers the state ---
         function blockIp(buttonElement, alertId) {
-            // Add the alert's unique ID to our set of blocked alerts
             blockedAlerts.add(alertId);
-
-            // Change button appearance to give user feedback
             buttonElement.textContent = 'Blocked';
             buttonElement.disabled = true;
             buttonElement.classList.remove('bg-red-600/50', 'hover:bg-red-600/80');
             buttonElement.classList.add('bg-gray-500', 'cursor-not-allowed');
+        }
 
-            // The alert() is optional now, as the UI state provides feedback
-            // alert("The IP has been blocked (simulation).");
+        // --- Historical Data Page Logic ---
+        const historicalLink = document.querySelector('a[href="#historical"]');
+        if (historicalLink) {
+            historicalLink.addEventListener('click', fetchHistoricalData);
+        }
+
+        async function fetchHistoricalData() {
+            console.log("Fetching historical data...");
+            try {
+                const response = await fetch('/get_historical_data');
+                const historicalAlerts = await response.json();
+                populateHistoricalTable(historicalAlerts);
+            } catch (error) {
+                console.error("Could not fetch historical data:", error);
+            }
+        }
+
+        function populateHistoricalTable(alerts) {
+            const tableBody = document.getElementById('historical-data-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            if (alerts.length === 0) {
+                const row = tableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 4;
+                cell.textContent = "No historical alerts found.";
+                cell.className = "text-center p-4 text-gray-500";
+            } else {
+                alerts.reverse().forEach(alert => {
+                    const row = tableBody.insertRow();
+                    row.className = "border-b border-gray-700 hover:bg-gray-700/50";
+                    row.insertCell().textContent = alert.Timestamp;
+                    row.insertCell().textContent = alert.Status;
+                    const typeCell = row.insertCell();
+                    typeCell.textContent = alert['Attack Type'];
+                    typeCell.className = "text-red-400 font-semibold";
+                    row.insertCell().textContent = alert.MSE;
+                    Array.from(row.cells).forEach(cell => cell.className += " p-2");
+                });
+            }
         }
     });
-  </script>
+</script>
 </body>
 </html>

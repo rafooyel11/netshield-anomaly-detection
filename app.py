@@ -4,6 +4,7 @@ from collections import deque
 from datetime import datetime
 import os
 import sys
+import csv
 
 # Add the 'python' subfolder to the system path
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,11 +20,14 @@ app = Flask(__name__)
 # load all models and configurations 
 rf_model, autoencoder, threshold, attack_mapping = load_all_models()
 
-# --- Initialize global variables ---
+# Initialize global variables 
 recent_alerts = deque(maxlen=20)
 packet_stats = {"total": 0, "TCP": 0, "UDP": 0, "Other": 0}
-# --- FIX: Initialize the missing variable here ---
+# Initialize the missing variable here 
 threats_in_last_interval = 0
+
+# historical data file
+HISTORICAL_DATA_FILE = os.path.join(script_dir, 'data', 'historical_alerts.csv')
 
 # prepare sample data for demo
 _, _, x_test, y_test = load_and_prepare_data()
@@ -61,6 +65,19 @@ def handle_prediction():
             prediction_result['timestamp'] = datetime.now().strftime("%H:%M:%S")
             recent_alerts.appendleft(prediction_result)
             threats_in_last_interval += 1 # Increment the counter
+
+            # save the anomaly to historical data
+            with open(HISTORICAL_DATA_FILE, 'a', newline='') as f:
+                writer = csv.writer(f)
+                # Write header if the file is new/empty
+                if f.tell() == 0:
+                    writer.writerow(['Timestamp', 'Status', 'Attack Type', 'MSE'])
+                writer.writerow([
+                    prediction_result['timestamp'],
+                    prediction_result['status'],
+                    prediction_result.get('attack_type', 'Unknown Anomaly'),
+                    f"{prediction_result.get('mse', 0):.6f}"
+                ])
         
         return jsonify({"status": "live packet received"}), 200
 
@@ -90,6 +107,19 @@ def get_dashboard_data():
     # Reset the interval counter after sending it
     threats_in_last_interval = 0
     return jsonify(data_to_send)
+
+# endpoint to for historical alerts
+@app.route('/get_historical_data')
+def get_historical_data():
+    """Reads the CSV file and returns all historical alerts."""
+    try:
+        with open(HISTORICAL_DATA_FILE, 'r') as f:
+            reader = csv.DictReader(f)
+            historical_alerts = list(reader)
+            return jsonify(historical_alerts)
+    except FileNotFoundError:
+        # If the file doesn't exist yet, return an empty list
+        return jsonify([])
 
 # run flask app
 if __name__ == '__main__':
